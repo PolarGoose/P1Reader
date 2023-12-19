@@ -1,0 +1,7 @@
+/.idea/
+/build/
+.pytest_cache/
+__pycache__/
+/src/app/logging/
+/src/app/wifi_manager/
+/src/app/MicroWebSrv2/
