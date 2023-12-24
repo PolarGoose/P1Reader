@@ -1,35 +1,38 @@
 #pragma once
 
-#include "Hal/IBoard.h"
+#include "Hal/External/IBoard.h"
+#include "Hal/SerialPort.h"
 #include "HardwareSerial.h"
 #include "Utils/NonCopyableAndNonMovable.h"
 
 namespace Hal {
 
 class Esp32Board : public IBoard, private Utils::NonCopyableAndNonMovable {
+private:
+  SerialPort _p1Port;
+  SerialPort _debugPort;
+
 public:
-  Esp32Board() {
-    // Configure P1SerialPort: UART2
-    Serial2.setRxBufferSize(8192);
-    Serial2.setTxBufferSize(8192);
-    Serial2.begin(115200, SERIAL_8N1,
+  Esp32Board(): _p1Port(/* UART2 */ Serial2), _debugPort(/* UART0 */Serial1) {
+    _p1Port.Raw().setRxBufferSize(8192);
+    _p1Port.Raw().setTxBufferSize(8192);
+    _p1Port.Raw().begin(115200, SERIAL_8N1,
                   /* Uart RX pin */ 16,
                   /* Uart TX pin */ 17);
 
-    // Configure DebugSerialPort: UART0
-    Serial.setRxBufferSize(8192);
-    Serial.setTxBufferSize(8192);
-    Serial.begin(921600, SERIAL_8N1,
+    _debugPort.Raw().setRxBufferSize(8192);
+    _debugPort.Raw().setTxBufferSize(8192);
+    _debugPort.Raw().begin(921600, SERIAL_8N1,
                  /* Uart RX pin */ 3,
                  /* Uart TX pin */ 1);
   }
 
-  Stream& GetP1SerialPort() override {
-    return Serial2;
+  SerialPort& GetP1SerialPort() override {
+    return _p1Port;
   }
 
-  Stream& GetDebugSerialPort() override {
-    return Serial;
+  SerialPort& GetDebugSerialPort() override {
+    return _debugPort;
   }
 
   int GetP1StreamEnablePinNumber() override {
